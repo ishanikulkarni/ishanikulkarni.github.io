@@ -3,7 +3,7 @@ let handlefail = function (err) {
 };
 
 let numPeople = 0;
-let people = [];
+let participants = [];
 
 function addVideoStream(streamId) {
   console.log();
@@ -14,6 +14,7 @@ function addVideoStream(streamId) {
   streamDiv.style.height = "150px";
   remoteContainer.style;
   remoteContainer.appendChild(streamDiv);
+  document.getElementById("participants").innerHTML += streamId + "\n";
   numPeople++;
 }
 
@@ -26,6 +27,7 @@ function addVideoStream2(streamId) {
   streamDiv.style.height = "150px";
   remoteContainer.style;
   remoteContainer.appendChild(streamDiv);
+  document.getElementById("participants").innerHTML += streamId + "\n";
   numPeople++;
 }
 
@@ -38,13 +40,15 @@ function addVideoStream3(streamId) {
   streamDiv.style.height = "150px";
   remoteContainer.style;
   remoteContainer.appendChild(streamDiv);
+  document.getElementById("participants").innerHTML += streamId + "\n";
   numPeople++;
 }
 
 document.getElementById("join").onclick = function () {
   let channelName = document.getElementById("channelName").value;
   let Username = document.getElementById("username").value;
-  people.push(Username);
+  document.getElementById("participants").innerHTML = Username + "\n";
+  participants.push(Username);
   let appId = "53ca517bfccd44f388878863903c1dc8";
 
   let client = AgoraRTC.createClient({
@@ -79,7 +83,6 @@ document.getElementById("join").onclick = function () {
   client.on("stream-subscribed", function (evt) {
     console.log("Subscribed Stream");
     let stream = evt.stream;
-    console.log(people);
     if (numPeople == 0) {
       addVideoStream(stream.getId());
       stream.play(stream.getId());
