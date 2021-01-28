@@ -3,7 +3,6 @@ let handlefail = function (err) {
 };
 
 let numPeople = 0;
-let participants = [];
 
 function addVideoStream(streamId) {
   console.log();
@@ -48,7 +47,6 @@ document.getElementById("join").onclick = function () {
   let channelName = document.getElementById("channelName").value;
   let Username = document.getElementById("username").value;
   document.getElementById("participants").innerHTML = Username + "\n";
-  participants.push(Username);
   let appId = "53ca517bfccd44f388878863903c1dc8";
 
   let client = AgoraRTC.createClient({
