@@ -3,17 +3,39 @@ let handlefail = function (err) {
 };
 
 let numPeople = 0;
+let globalStream;
+let isAudioMuted = false;
+let isVidioMuted = false;
+
+let appId = "53ca517bfccd44f388878863903c1dc8";
+
+let client = AgoraRTC.createClient({
+  mode: "live",
+  codec: "h264",
+});
+
+client.init(appId, () => console.log("AgoraRTC Client Connected"), handlefail);
+
+function removeMyVideoStream() {
+  globalStream.stop();
+}
+
+function removeVideoStream(evt) {
+  let stream = evt.stream;
+  stream.stop();
+  let remDiv = document.getElementById(stream.getId());
+  remDiv.parentNode.removeChild(remDiv);
+}
 
 function addVideoStream(streamId) {
-  console.log();
   let remoteContainer = document.getElementById("remoteStream");
   let streamDiv = document.createElement("div");
   streamDiv.id = streamId;
   // streamDiv.style.transform = "rotateY(180deg)";
-  streamDiv.style.height = "150px";
+  streamDiv.style.height = "305px";
   remoteContainer.style;
   remoteContainer.appendChild(streamDiv);
-  document.getElementById("participants").innerHTML += streamId + "\n";
+  document.getElementById("participants").innerHTML += ", " + streamId;
   numPeople++;
 }
 
@@ -26,7 +48,7 @@ function addVideoStream2(streamId) {
   streamDiv.style.height = "150px";
   remoteContainer.style;
   remoteContainer.appendChild(streamDiv);
-  document.getElementById("participants").innerHTML += streamId + "\n";
+  document.getElementById("participants").innerHTML += ", " + streamId;
   numPeople++;
 }
 
@@ -39,26 +61,21 @@ function addVideoStream3(streamId) {
   streamDiv.style.height = "150px";
   remoteContainer.style;
   remoteContainer.appendChild(streamDiv);
-  document.getElementById("participants").innerHTML += streamId + "\n";
+  document.getElementById("participants").innerHTML += ", " + streamId;
   numPeople++;
 }
+
+document.getElementById("leave").onclick = function () {
+  client.leave(function () {
+    console.log("Left!");
+  }, handlefail);
+  removeMyVideoStream();
+};
 
 document.getElementById("join").onclick = function () {
   let channelName = document.getElementById("channelName").value;
   let Username = document.getElementById("username").value;
-  document.getElementById("participants").innerHTML = Username + "\n";
-  let appId = "53ca517bfccd44f388878863903c1dc8";
-
-  let client = AgoraRTC.createClient({
-    mode: "live",
-    codec: "h264",
-  });
-
-  client.init(
-    appId,
-    () => console.log("AgoraRTC Client Connected"),
-    handlefail
-  );
+  document.getElementById("participants").innerHTML = Username;
 
   client.join(null, channelName, Username, () => {
     var localStream = AgoraRTC.createStream({
@@ -71,6 +88,8 @@ document.getElementById("join").onclick = function () {
       console.log(`App id: ${appId}\nChannel id: ${channelName}`);
       client.publish(localStream);
     });
+
+    globalStream = localStream;
   });
 
   client.on("stream-added", function (evt) {
@@ -94,4 +113,29 @@ document.getElementById("join").onclick = function () {
       console.log("Max Participants are filled");
     }
   });
+
+  client.on("peer-leave", function (evt) {
+    console.log("Peer has left");
+    removeVideoStream(evt);
+  });
+};
+
+document.getElementById("video-mute").onclick = function () {
+  if (!isVidioMuted) {
+    globalStream.muteVideo();
+    isVidioMuted = true;
+  } else {
+    globalStream.unmuteVideo();
+    isVidioMuted = false;
+  }
+};
+
+document.getElementById("audio-mute").onclick = function () {
+  if (!isAudioMuted) {
+    globalStream.muteAudio();
+    isAudioMuted = true;
+  } else {
+    globalStream.unmuteAudio();
+    isAudioMuted = false;
+  }
 };
