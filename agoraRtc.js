@@ -7,7 +7,7 @@ let globalStream;
 let isAudioMuted = false;
 let isVidioMuted = false;
 
-let appId = "53ca517bfccd44f388878863903c1dc8";
+let appId = "5651306a1cb0492db118cfe643e8c9c4";
 
 let client = AgoraRTC.createClient({
   mode: "live",
